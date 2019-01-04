@@ -124,16 +124,18 @@ def file_s3file_s3_rename_upload():
 @app.route('/link', methods=['GET'])
 def download_from_link():
     name1 = "0"
+    name2 = "0"
     url = request.args.get('url')
     try:
         name = request.args.get('name')
         reqname= name
     except:
-        name1 = filename_via_cd(url_response(url).headers.get('content-disposition'))
-        name = name1
-    else:
-        name2 = filename_via_url(url)
-        name = name2
+        try:
+            name1 = filename_via_cd(url_response(url).headers.get('content-disposition'))
+            name = name1
+        except:
+            name2 = filename_via_url(url)
+            name = name2
     file = this_path+UPLOAD_FOLDER+name
     try:
         open(file,'wb').write(url_response(url).content)
