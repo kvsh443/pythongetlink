@@ -126,10 +126,8 @@ def download_from_link():
     name1 = "0"
     name2 = "0"
     url = request.args.get('url')
-    try:
-        name = request.args.get('name')
-        reqname= name
-    except:
+    name = request.args.get('name')
+    if not name:
         try:
             name1 = filename_via_cd(url_response(url).headers.get('content-disposition'))
             name = name1
