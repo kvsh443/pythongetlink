@@ -137,8 +137,8 @@ def download_from_link():
     file = this_path+UPLOAD_FOLDER+name
     try:
         open(file,'wb').write(url_response(url).content)
-    finally:
-        file.close()
+    except:
+        print(file+" writing unsuccessful! ")
     out = "Downloaded from:- {0} as file name:- {1} if content-headers-disposition:- {2} if name via url:- {3} path:- {4}".format(url, reqname, name1, name2,file)
     print(out)
     return (out)
