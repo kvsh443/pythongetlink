@@ -30,7 +30,7 @@ try:
                         config=Config(signature_version='oauth'),
                         endpoint_url=service_endpoint)
 except:
-    print("Unable to access ibm_boto3.{0} terminating the program".format(__main__))
+    print("Unable to access ibm_boto3.{0} terminating the program".format(__name__))
 
 def download_item(bucket_name, item_name, path):
     print("Downloading item from the bucket: {0}, key: {1}".format(bucket_name, item_name))
