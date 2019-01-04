@@ -5,6 +5,10 @@ import json
 from ibm_botocore.client import Config
 import ibm_boto3
 from os import path
+import requests
+import re
+import string
+import random
 
 this_path = os.getcwd()
 
@@ -58,6 +62,26 @@ def rename_file(file_path,item_name,filename):
     os.rename(file_path,new_file_path)
     return new_file_path
 
+def id_gen(size=8, chars=string.ascii_uppercase + string.digits):
+    return (''.join(random.choice(chars) for _ in range(size)))
+
+def url_response(url):
+    headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
+    return requests.get(url, headers=headers, allow_redirects=True)
+
+def filename_via_cd(cd):
+    if not cd:
+        return None
+    fname = re.findall('filename(.+)',cd)
+    if len(fname) == 0:
+        return None
+    return fname[0]
+
+def filename_via_url(url):
+    if url.find('/'):
+        return url.rsplit('/',1)[1]
+    else:
+        return (id_gen()+"no.xt")
 
 @app.route('/')
 def root():
@@ -89,11 +113,29 @@ def file_s3_rename():
 
 @app.route('/renu', methods=['GET'])
 def file_s3file_s3_rename_upload():
-    file = request.args.get(file)
+    file = request.args.get('file')
     path ="/"+file
     new = request.args.get('new')
     filepath = ("kvsh",(rename_file(download_item("kvsh",file,path),file,new)),new) #keep the renamed file in the server an upload the new file to s3
     out = ("File Name on s3:{0} \n File Name on Server: {1}".format(file,filepath))
+    print(out)
+    return (out)
+
+@app.route('/link', methods=['GET'])
+def download_from_link():
+    name1 = "0"
+    url = request.args.get('url')
+    try:
+        name = request.args.get('name')
+    except:
+        name1 = filename_via_cd(url_response(url).headers.get('content-disposition'))
+        name = name1
+    finally:
+        name = filename_via_url(url)
+
+    file = this_path+UPLOAD_FOLDER+name
+    open(file,'wb').write(url_response(url).content)
+    out = "Downloaded from:- {0} as file name:- {1} if content-headers-disposition:- {2} path:- {3}".format(url, name, name1, file)
     print(out)
     return (out)
 
