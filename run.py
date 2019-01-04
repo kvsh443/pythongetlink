@@ -130,11 +130,14 @@ def download_from_link():
     except:
         name1 = filename_via_cd(url_response(url).headers.get('content-disposition'))
         name = name1
-    finally:
+    except:
         name = filename_via_url(url)
 
     file = this_path+UPLOAD_FOLDER+name
-    open(file,'wb').write(url_response(url).content)
+    try:
+        open(file,'wb').write(url_response(url).content)
+    finally:
+        file.close()
     out = "Downloaded from:- {0} as file name:- {1} if content-headers-disposition:- {2} path:- {3}".format(url, name, name1, file)
     print(out)
     return (out)
