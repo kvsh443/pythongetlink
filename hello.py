@@ -4,7 +4,6 @@ import os
 import json
 from ibm_botocore.client import Config
 import ibm_boto3
-from werkzeug.utils import secure_filename
 from os import path
 
 this_path = os.getcwd()
