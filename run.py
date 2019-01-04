@@ -127,18 +127,19 @@ def download_from_link():
     url = request.args.get('url')
     try:
         name = request.args.get('name')
+        reqname= name
     except:
         name1 = filename_via_cd(url_response(url).headers.get('content-disposition'))
         name = name1
-    except:
-        name = filename_via_url(url)
-
+    else:
+        name2 = filename_via_url(url)
+        name = name2
     file = this_path+UPLOAD_FOLDER+name
     try:
         open(file,'wb').write(url_response(url).content)
     finally:
         file.close()
-    out = "Downloaded from:- {0} as file name:- {1} if content-headers-disposition:- {2} path:- {3}".format(url, name, name1, file)
+    out = "Downloaded from:- {0} as file name:- {1} if content-headers-disposition:- {2} if name via url:- {3} path:- {4}".format(url, reqname, name1, name2,file)
     print(out)
     return (out)
 
