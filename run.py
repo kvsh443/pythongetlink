@@ -3,7 +3,7 @@ import atexit
 import os
 import json
 from ibm_botocore.client import Config
-import ibm_boto3
+import ibm_boto3 
 from os import path
 
 this_path = os.getcwd()
