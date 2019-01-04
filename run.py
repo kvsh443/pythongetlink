@@ -3,7 +3,7 @@ import atexit
 import os
 import json
 from ibm_botocore.client import Config
-import ibm_boto3 
+import ibm_boto3
 from os import path
 
 this_path = os.getcwd()
@@ -18,16 +18,20 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 # When running this app on the local machine, default the port to 8000
 port = int(os.getenv('PORT', 8000))
 #
-api_key = os.environ['cos_api_key']
-service_instance_id = os.environ['cos_resource_instance_id']
-auth_endpoint = 'https://iam.bluemix.net/oidc/token'
-service_endpoint = 'https://s3.us-east.objectstorage.softlayer.net'
-cos = ibm_boto3.resource('s3',
-                      ibm_api_key_id=api_key,
-                      ibm_service_instance_id=service_instance_id,
-                      ibm_auth_endpoint=auth_endpoint,
-                      config=Config(signature_version='oauth'),
-                      endpoint_url=service_endpoint)
+try:
+    api_key = os.environ['cos_api_key']
+    service_instance_id = os.environ['cos_resource_instance_id']
+    auth_endpoint = 'https://iam.bluemix.net/oidc/token'
+    service_endpoint = 'https://s3.us-east.objectstorage.softlayer.net'
+    cos = ibm_boto3.resource('s3',
+                        ibm_api_key_id=api_key,
+                        ibm_service_instance_id=service_instance_id,
+                        ibm_auth_endpoint=auth_endpoint,
+                        config=Config(signature_version='oauth'),
+                        endpoint_url=service_endpoint)
+except:
+    print("Unable to access ibm_boto3.{0} terminating the program".format(__main__))
+
 def download_item(bucket_name, item_name, path):
     print("Downloading item from the bucket: {0}, key: {1}".format(bucket_name, item_name))
     file_path = this_path+UPLOAD_FOLDER+path
@@ -44,8 +48,10 @@ def upload_item(bucket_name, path, item_name):
     try:
         cos.meta.client.upload_file(file_path, bucket_name, item_name)
         print("File contents: {0} added to {1}".format(item_name,bucket_name))
+        return file_path
     except Exception as e:
         print("Unable to Upload file contents: {0}".format(e))
+
 
 def rename_file(file_path,item_name,filename):
     new_file_path = this_path+UPLOAD_FOLDER+filename
@@ -79,6 +85,16 @@ def file_s3_rename():
     filepath = rename_file(download_item("kvsh",file,path),file,newname)
     print("File Name on s3:{0} \n File Name on Server: {1}".format(file,filepath))
     out = "File Name on s3:{0} \n File Name on Server: {1}".format(file,filepath)
+    return (out)
+
+@app.route('/renu', methods=['GET'])
+def file_s3file_s3_rename_upload():
+    file = request.args.get(file)
+    path ="/"+file
+    new = request.args.get('new')
+    filepath = ("kvsh",(rename_file(download_item("kvsh",file,path),file,new)),new) #keep the renamed file in the server an upload the new file to s3
+    out = ("File Name on s3:{0} \n File Name on Server: {1}".format(file,filepath))
+    print(out)
     return (out)
 
 @atexit.register

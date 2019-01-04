@@ -1,5 +1,5 @@
 ---
 applications:
- - name: GetStartedPython
+ - name: Get-Link
    random-route: true
    memory: 128M
