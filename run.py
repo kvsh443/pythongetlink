@@ -67,11 +67,9 @@ def id_gen(size=8, chars=string.ascii_uppercase + string.digits):
 
 def url_response(url):
     headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
-    return requests.get(url, headers=headers, allow_redirects=True)
+    return requests.get(url, headers=headers, allow_redirects=True, stream=True)
 
 def filename_via_cd(cd):
-    if not cd:
-        return None
     fname = re.findall('filename(.+)',cd)
     if len(fname) == 0:
         return None
@@ -80,7 +78,8 @@ def filename_via_cd(cd):
 def filename_via_url(url):
     if url.find('/'):
         return url.rsplit('/',1)[1]
-    else:
+
+def filename_random():
         return (id_gen()+"no.xt")
 
 @app.route('/')
@@ -123,23 +122,25 @@ def file_s3file_s3_rename_upload():
 
 @app.route('/link', methods=['GET'])
 def download_from_link():
-    name1="1"
-    name2="2"
     url = request.args.get('url')
-    name = request.args.get('name')
-    if name == None:
-        try:
-            name1 = filename_via_cd(url_response(url).headers.get('content-disposition'))
-            name = name1
-        except:
-            name2 = filename_via_url(url)
-            name = name2
+    type = request.args.get('type')
+    if type == '1':
+        name = filename_via_cd(url_response(url).headers.get('content-disposition'))
+    elif type == '2':
+        name = filename_via_url(url)
+    elif type == '0':
+        name = request.args.get('name')
+    else:
+        name = filename_random()
     file = this_path+UPLOAD_FOLDER+name
     try:
-        open(file,'wb').write(url_response(url).content)
+        with open(file,'wb') as f:
+            for chunk in url_response(url).iter_content(chunk_size=1024):
+                if chunk:
+                    f.write(chunk)
     except:
         print(file+" writing unsuccessful! ")
-    out = "Downloaded from:- {0} as file name:- {1} if content-headers-disposition:- {2} if name via url:- {3} path:- {4}".format(url, reqname, name1, name2,file)
+    out = "Downloaded from:- {0} as file name:- {1} path:- {2}".format(url, name ,file)
     print(out)
     return (out)
 
