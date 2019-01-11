@@ -124,8 +124,9 @@ def file_s3file_s3_rename_upload():
 def download_from_link():
     url = request.args.get('url')
     type = request.args.get('type')
+    res = url_response(url)
     if type == '2':
-        name = filename_via_cd(url_response(url).headers.get('content-disposition'))
+        name = filename_via_cd(res.headers.get('content-disposition'))
     elif type == '1':
         name = filename_via_url(url)
     elif type == '0':
@@ -135,7 +136,7 @@ def download_from_link():
     file = this_path+UPLOAD_FOLDER+name
     try:
         with open(file,'wb') as f:
-            for chunk in url_response(url).iter_content(chunk_size=1024):
+            for chunk in res.iter_content(chunk_size=1024):
                 if chunk:
                     f.write(chunk)
     except:
