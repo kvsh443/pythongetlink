@@ -95,8 +95,8 @@ def file_s3():
     file = request.args.get('file')
     path = file
     filepath = download_item("kvsh",file,path)
-    print("File Name on s3:{0} \n File Name on Server: {1}".format(file,filepath))
     out = "File Name on s3:{0} \n File Name on Server: {1}".format(file,filepath)
+    print(out)
     return (out)
     #return send_from_directory(app.config['UPLOAD_FOLDER'],file)
 
@@ -106,8 +106,8 @@ def file_s3_rename():
     path = "/"+file
     newname= request.args.get('new')
     filepath = rename_file(download_item("kvsh",file,path),file,newname)
-    print("File Name on s3:{0} \n File Name on Server: {1}".format(file,filepath))
     out = "File Name on s3:{0} \n File Name on Server: {1}".format(file,filepath)
+    print(out)
     return (out)
 
 @app.route('/renu', methods=['GET'])
@@ -124,9 +124,9 @@ def file_s3file_s3_rename_upload():
 def download_from_link():
     url = request.args.get('url')
     type = request.args.get('type')
-    if type == '1':
+    if type == '2':
         name = filename_via_cd(url_response(url).headers.get('content-disposition'))
-    elif type == '2':
+    elif type == '1':
         name = filename_via_url(url)
     elif type == '0':
         name = request.args.get('name')
