@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, jsonify, redirect, send_from_directory, url_for
-import atexit
+# import atexit - run at program exits
 import os
 import json
 from ibm_botocore.client import Config
@@ -145,10 +145,12 @@ def download_from_link():
     print(out)
     return (out)
 
+'''
 @atexit.register
 def shutdown():
     if client:
         client.disconnect()
+''' # client disconnect stopped
 
 if __name__ == '__main__':
 
